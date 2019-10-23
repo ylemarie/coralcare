@@ -9,10 +9,8 @@
 
 * curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 * sudo apt-get install -y nodejs
-* npm install express
-* npm install http
-* npm install socket.io
-* npm install jsonfile
+* npm install jsonfile underscore express http socket.io dateformat onoff
+
 
 ## ABElectronics Library
 * git clone https://github.com/abelectronicsuk/ABElectronics_NodeJS_Libraries.git
@@ -21,11 +19,3 @@
 
 * cd ~/projet/coralcare
 * sudo node app.js
-
-## Maybe others packages
-
-* npm install moment
-* npm install twix
-* npm install dateformat
-* npm install jsonfile
-* npm install underscore
