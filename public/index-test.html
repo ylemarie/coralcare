@@ -1,0 +1,273 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+	<title>Aqua Survey</title>
+	<meta name="viewport" content="width=400" />
+	
+	<script src="socket.io/socket.io.js"></script>
+	<script src="gauge.min.js"></script>
+
+	<link rel="stylesheet" href="slider.css">
+	<link rel="stylesheet" href="yle.css">
+	<style>
+	body {
+		color: white;
+        background-color: white;
+	}
+	</style>
+
+  </head>
+  <body>
+  	<div id="header">
+    	<div id='titre'>Oscillator</div>
+    	<div id="menu">
+    		<a href="parameters.html"><img id="parameters" src="parameters.png"></a>
+    	</div>
+    </div>
+
+    <canvas id="oscillo1"></canvas>
+    <canvas id="oscillo2"></canvas>
+    <canvas id="oscillo3"></canvas>
+<script>
+var oscillo1 = new RadialGauge({
+    renderTo: 'oscillo1',
+    width: 300,
+    height: 300,
+    units: 'Oscillo 1',
+    value: 0,
+    minValue: 0,
+    startAngle: 180,
+    ticksAngle: 180,
+    valueBox: true,
+    maxValue: 250,
+    majorTicks: [
+        '0','25','50','75','100','125','150','175','200','225','250'
+    ],
+    minorTicks: 2,
+    strokeTicks: true,
+    highlights: [
+        { from:   0, to: 125, color: 'rgba(200,50,50,.75)' },
+        { from: 125, to: 250, color: 'rgba(0,128,0,.75)' }
+    ],
+    colorPlate: '#fff',
+    borderShadowWidth: 0,
+    borders: false,
+/*
+    needleType: 'arrow',
+    needleWidth: 2,
+    needleCircleSize: 7,
+    needleCircleOuter: true,
+    needleCircleInner: false,
+*/
+    needleType: 'line',
+    needleStart: 75,
+    needleEnd : 99,
+    needlewidth:3,
+    needleStart: 75,
+    needleEnd: 99,
+
+    animationDuration: 500,
+    animationRule: 'linear',
+    animationTarget: 'plate'
+});
+oscillo1.value = 150;    
+
+var oscillo2 = new RadialGauge({
+    renderTo: 'oscillo2',
+    width: 300,
+    height: 300,
+    units: 'Oscillo 2',
+    value: 0,
+    minValue: 0,
+    startAngle: 180,
+    ticksAngle: 180,
+    valueBox: true,
+    maxValue: 250,
+    majorTicks: [
+        '0','25','50','75','100','125','150','175','200','225','250'
+    ],
+    minorTicks: 2,
+    strokeTicks: true,
+    highlights: [
+        { from:   0, to: 125, color: 'rgba(200,50,50,.75)' },
+        { from: 125, to: 250, color: 'rgba(0,128,0,.75)' }
+    ],
+    colorPlate: '#fff',
+    borderShadowWidth: 0,
+    borders: false,
+    needleType: 'arrow',
+    needleWidth: 2,
+    needleCircleSize: 7,
+    needleCircleOuter: true,
+    needleCircleInner: false,
+    animationDuration: 500,
+    animationRule: 'linear',
+    animationTarget: 'plate'
+});
+oscillo2.value = 50; 
+
+var oscillo3 = new RadialGauge({
+    renderTo: 'oscillo3',
+    width: 300,
+    height: 300,    
+    minValue: 0,
+    maxValue: 250,
+    majorTicks: [0,50,100,150,200,250],
+    minorTicks: 5,
+    ticksAngle: 180,
+    startAngle: 180,
+    strokeTicks: false,
+    highlights: [
+        { from:   0, to: 125, color: 'rgba(200,50,50,.75)' },
+        { from: 125, to: 250, color: 'rgba(0,128,0,.75)' }
+    ],
+    colorPlate: '#33a',
+    colorMajorTicks: '#f5f5f5',
+    colorMinorTicks: '#ddd',
+    colorNumbers: '#ccc',
+    colorNeedle: 'rgba(240, 128, 128, 1)',
+    colorNeedleEnd: 'rgba(255, 160, 122, .9)',
+    valueBox: false,
+    valueTextShadow: false,
+    colorCircleInner: '#fff',
+    colorNeedleCircleOuter: '#ccc',
+    needleCircleSize: 15,
+    needleCircleOuter: false,
+    animationRule: 'linear',
+    needleType: 'line',
+    needleStart: 75,
+    needleEnd: 99,
+    needleWidth: 3,
+    borders: true,
+    borderInnerWidth: 0,
+    borderMiddleWidth: 0,
+    borderOuterWidth: 10,
+    colorBorderOuter: '#ccc',
+    colorBorderOuterEnd: '#ccc',
+    colorNeedleShadowDown: '#222',
+    borderShadowWidth: 0,
+    animationTarget: 'plate',
+    units: 'Oscillo',
+    title: 'n°1',
+    fontTitleSize: 19,
+    colorTitle: '#f5f5f5',
+    valueBox: true,
+    colorValueBoxRect: '#222',
+    colorValueBoxRectEnd: '#333',
+    animationDuration: 1000
+});
+oscillo3.value = 75; 
+</script>
+<!-- ******************************* -->
+	<script type="text/javascript">		
+		var socket = io.connect();
+		var DEBUG = 1;	//Debug
+
+		function socketInfos() {
+			socket.on('oscillator', function (data) {				
+				if (DEBUG) console.log(data);
+				oscillo1.value = data.infos.servo1;
+				oscillo2.value = data.infos.servo2;
+/*
+				document.getElementById( "hour" ).innerHTML = data.infos.hour;
+				//document.getElementById( "status" ).innerHTML = data.infos.status;
+				//document.getElementById( "problem" ).innerHTML = data.infos.problem;
+
+		        if (data.infos.status != "0") {
+		            document.getElementById( "status" ).innerHTML = data.infos.problem;
+		            document.getElementById( "infos" ).style.backgroundColor = "red";
+		            document.getElementById( "infos" ).style.width = "100%";
+		        } else {
+		            document.getElementById( "status" ).innerHTML = "all OK";
+		            document.getElementById( "infos" ).style.backgroundColor = "green";
+		        }
+
+				document.getElementById( "temp1" ).innerHTML = data.infos.temp1.value + "°";
+				if (data.infos.temp1.status == 0) document.getElementById( "temp1_img" ).src = "temp-ok.png";
+				else document.getElementById( "temp1_img" ).src = "temp-ko.png";
+
+				document.getElementById( "temp2" ).innerHTML = data.infos.temp2.value + "°";
+				if (data.infos.temp2.status == 0) document.getElementById( "temp2_img" ).src = "temp-ok.png";
+				else document.getElementById( "temp2_img" ).src = "temp-ko.png";
+
+				document.getElementById( "temp3" ).innerHTML = data.infos.temp3.value + "°";
+				if (data.infos.temp3.status == 0) document.getElementById( "temp3_img" ).src = "temp-ok.png";
+				else document.getElementById( "temp3_img" ).src = "temp-ko.png";
+
+
+				document.getElementById( "temp4" ).innerHTML = data.infos.temp4.value + "°";
+				if (data.infos.temp4.status == 0) document.getElementById( "temp4_img" ).src = "temp-ok.png";
+				else document.getElementById( "temp4_img" ).src = "temp-ko.png";
+
+				document.getElementById( "decant_min" ).innerHTML = data.infos.decant_min.value;
+				if (data.infos.decant_min.value == 1) document.getElementById( "decant_min_img" ).src = "level-ok.png";
+				else document.getElementById( "decant_min_img" ).src = "level-ko.png";
+
+				document.getElementById( "decant_max" ).innerHTML = data.infos.decant_max.value;
+				if (data.infos.decant_max.value == 1) document.getElementById( "decant_max_img" ).src = "level-ok.png";
+				else document.getElementById( "decant_max_img" ).src = "level-ko.png";
+
+				document.getElementById( "osmolation" ).innerHTML = data.infos.osmolation.value;
+				if (data.infos.osmolation.value == 1) document.getElementById( "osmolation_img" ).src = "level-ok.png";
+				else document.getElementById( "osmolation_img" ).src = "level-ko.png";
+
+				document.getElementById( "osmosee" ).innerHTML = data.infos.osmosee.value;
+				if (data.infos.osmosee.value == 1) document.getElementById( "osmosee_img" ).src = "level-ok.png";
+				else document.getElementById( "osmosee_img" ).src = "level-ko.png";
+*/
+			});			
+		}
+/*
+		document.write('	\
+			<div id="infos">	\
+				<span id="hour">xxx</span><br/>	\
+				<span id="status">xxx</span>	\
+			</div>	\
+			<div class="blocTemp"> \
+				<span class="titreBac">T° eau bac</span>	\
+				<img id="temp1_img" class="img_niveau" src="temp-ok.png"/> \
+				<span id="temp1">xx</span> \
+			</div>	\
+			<div class="blocTemp"> \
+				<span class="titreBac">T° eau décant</span>	\
+				<img id="temp2_img" class="img_niveau" src="temp-ko.png"/> \
+				<span id="temp2">xx</span> \
+				</div>	\
+			<div class="blocTemp"> \
+				<span class="titreBac">T° air bac</span>	\
+				<img id="temp3_img" class="img_niveau" src="temp-ok.png"/> \
+				<span id="temp3">xx</span> \
+			</div>	\
+			<div class="blocTemp"> \
+				<span class="titreBac">T° air decant</span>	\
+				<img id="temp4_img" class="img_niveau" src="temp-ko.png"/> \
+				<span id="temp4">xx</span> \
+			</div>	\
+			<div class="blocTemp"> \
+				<span class="titreBac">Decant Min</span>	\
+				<img id="decant_min_img" class="img_niveau" src="level-ok.png"/> \
+				<span id="decant_min">xx</span> \
+			</div>	\
+			<div class="blocTemp"> \
+				<span class="titreBac">Decant Max</span>	\
+				<img id="decant_max_img" class="img_niveau" src="level-ko.png"/> \
+				<span id="decant_max">xx</span> \
+			</div>	\
+			<div class="blocTemp"> \
+				<span class="titreBac">Osmolation</span>	\
+				<img id="osmolation_img" class="img_niveau" src="level-ok.png"/> \
+				<span id="osmolation">xx</span> \
+			</div>	\
+			<div class="blocTemp"> \
+				<span class="titreBac">Osmosée</span>	\
+				<img id="osmosee_img" class="img_niveau" src="level-ko.png"/> \
+				<span id="osmosee">xx</span> \
+			</div>	\
+		');
+		*/
+		socketInfos();		
+
+	</script>
+
+  </body>
+</html>

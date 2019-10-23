@@ -1,0 +1,246 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+	<title>Oscillator</title>
+	<meta name="viewport" content="width=400" />
+	
+	<script src="socket.io/socket.io.js"></script>
+	<script src="gauge.min.js"></script>
+
+	<link rel="stylesheet" href="slider.css">
+	<link rel="stylesheet" href="yle.css">
+	<style>
+	body {
+		color: #000;
+		background:  #fff;
+	}
+	</style>
+
+  </head>
+  <body>
+  	<div id="header">
+    	<div id='titre'>Oscillator x4</div>
+    </div>
+    <div id="infos">
+    	<canvas id="oscillo1" onclick="startStop(1)"></canvas>
+	    <canvas id="oscillo2" onclick="startStop(2)"></canvas>
+	    <canvas id="oscillo3" onclick="startStop(3)"></canvas>
+	    <canvas id="oscillo4" onclick="startStop(4)"></canvas>
+	</div>
+	<div>
+		<input type="image" class="oscilloswitch" id="oscilloswitch" value="xxx" src="on.png" onclick="switchOscillo(this.value)">
+		<div id="move" style="display: none">
+			<div>
+				<select id="oscillo">
+					<option value="1">Oscillo n°1</option>
+					<option value="2">Oscillo n°2</option>
+					<option value="3">Oscillo n°3</option>
+					<option value="4">Oscillo n°4</option>
+				</select>
+			</div>
+			<div id="oscillomove">
+				Déplacer:
+				<input type="image" class="oscilloswitch" id="oscillorewind" src="rewind.png" onclick="moveOscilloLimite(1)">		
+				<input type="image" class="oscilloswitch" id="oscillomoins" src="moins.png" onclick="moveOscillo(-1)">		
+				<input type="number" class="oscilloswitch" id="oscillostep" value="1">
+				<input type="image" class="oscilloswitch" id="oscilloplus" src="plus.png"  onclick="moveOscillo(1)">				
+				<input type="image" class="oscilloswitch" id="oscillofastforward" src="fastforward.png" onclick="moveOscilloLimite(250)">											
+			</div>
+		</div>
+		<div id="reglage" style="display: none">
+			<div id="limiteval">
+				Définir limites: 
+				<select id="limite">
+					<option value="start">Start</option>
+					<option value="stop">Stop</option>
+				</select>
+				<input type="text" id="valeur" value="xxx" disabled="disabled">
+			</div>
+			<div>
+				<input type="image" class="oscilloswitch" id="getval" src="info.png"  onclick="getValeur()">
+			</div>
+			<div id="vitesse">
+				Ralenti:
+				<input type="number" class="oscilloswitch" id="ralenti" value="" min="75">
+			</div>
+			<div id="inforalenti">
+				<input type="image" class="oscilloswitch" id="getvalralenti" src="info.png"  onclick="getValeurRalenti()">			
+			</div>
+			<div>
+				<input type="image" class="oscilloswitch" id="save" src="save.png"  onclick="save()">							
+			</div>
+	</div>
+<script>
+
+var oscillo1 = new RadialGauge({
+    renderTo: 'oscillo1',
+    units: 'Oscillo',
+    title: 'n° 1',
+});
+oscillo1.value = 5; 
+
+var oscillo2 = new RadialGauge({
+    renderTo: 'oscillo2',
+    units: 'Oscillo',
+    title: 'n° 2',
+});
+oscillo2.value = 50; 
+
+var oscillo3 = new RadialGauge({
+    renderTo: 'oscillo3',
+    units: 'Oscillo',
+    title: 'n° 3',
+});
+oscillo3.value = 100; 
+
+var oscillo4 = new RadialGauge({
+    renderTo: 'oscillo4',
+    units: 'Oscillo',
+    title: 'n° 4',
+});
+oscillo4.value = 150; 
+
+document.gauges.forEach(function (gauge) {
+	gauge.update({
+	    width: 300,
+	    height: 300,
+	    minValue: 0,
+	    maxValue: 250,
+	    majorTicks: [0,25,50,75,100,125,150,175,200,225,250],
+	    minorTicks: 2,
+	    strokeTicks: true,
+	    highlights: [ 
+	        { from:   0, to: 125, color: 'rgba(200,50,50,.75)' },
+	        { from: 125, to: 250, color: 'rgba(0,128,0,.75)' }
+	    ],
+	    ticksAngle: 180,
+	    startAngle: 180,
+	    colorMajorTicks: '#ddd',
+	    colorMinorTicks: '#ddd',
+	    colorTitle: '#eee',
+	    colorUnits: '#ccc',
+	    colorNumbers: '#eee',
+	    colorPlate: '#222',
+	    borderShadowWidth: 0,
+	    borders: true,
+	    needleType: 'line',
+	    needleStart: 75,
+	    needleEnd: 99,
+	    needleWidth: 3,        
+	    animationDuration: 500,
+	    animationRule: 'linear',
+	    animationTarget: 'plate',
+	    colorBorderOuter: '#333',
+	    colorBorderOuterEnd: '#111',
+	    colorBorderMiddle: '#222',
+	    colorBorderMiddleEnd: '#111',
+	    colorBorderInner: '#111',
+	    colorBorderInnerEnd: '#333',
+	    colorNeedleShadowDown: '#333',
+	    colorNeedleCircleOuter: '#333',
+	    colorNeedleCircleOuterEnd: '#111',
+	    colorNeedleCircleInner: '#111',
+	    colorNeedleCircleInnerEnd: '#222',
+	    valueBoxBorderRadius: 0,
+	    colorValueBoxRect: '#222',
+	    colorValueBoxRectEnd: '#333'
+	})
+});
+
+</script>
+<!-- ******************************* -->
+	<script type="text/javascript">		
+		var socket = io.connect();
+		var DEBUG = 1;	//Debug
+		var ON = 1;
+		var OFF = 0;
+
+		//debug
+	    socket.on('message', function(message) {
+	        console.log('Le serveur a un message pour vous : ' + message);
+	    })
+
+		//ecoute socket oscillator
+		socket.on('oscillator', function(data) {				
+			if (DEBUG) console.log(data);
+			oscillo1.value = data.infos.oscillo1.pos;
+			oscillo1.update({title:"@ " + data.infos.oscillo1.ralenti});
+			oscillo1.update({units: data.infos.oscillo1.start + " - " + data.infos.oscillo1.stop});
+
+			oscillo2.value = data.infos.oscillo2.pos;
+			oscillo2.update({title:"@ " + data.infos.oscillo2.ralenti});
+			oscillo2.update({units: data.infos.oscillo2.start + " - " + data.infos.oscillo2.stop});
+
+			oscillo3.value = data.infos.oscillo3.pos;
+			oscillo3.update({title:"@ " + data.infos.oscillo3.ralenti});
+			oscillo3.update({units: data.infos.oscillo3.start + " - " + data.infos.oscillo3.stop});
+
+			oscillo4.value = data.infos.oscillo4.pos;
+			oscillo4.update({title:"@ " + data.infos.oscillo4.ralenti});
+			oscillo4.update({units: data.infos.oscillo4.start + " - " + data.infos.oscillo4.stop});
+
+			document.getElementById('oscilloswitch').value = data.infos.oscillo1.state;	//les 4 oscillo start/stop en meme temps
+
+		});			
+		
+		//envoi socket startStop
+		function switchOscillo(value) {
+			if (DEBUG) { console.log('switchOscillo('+value+") envoi socket startstop"); }
+			socket.emit('startstop', { state: value} );
+			if (value == ON) {
+				document.getElementById('oscilloswitch').src = "off.png";
+				document.getElementById('move').style = "display:block";
+				document.getElementById('reglage').style = "display:block";
+
+			} else {
+				document.getElementById('oscilloswitch').src = "on.png";			
+				document.getElementById('move').style = "display:none";
+				document.getElementById('reglage').style = "display:none";
+
+			}
+		}
+
+		//envoi socket oscillomove
+		function moveOscillo(sens) {
+			num = document.getElementById('oscillo').value;
+			steps = document.getElementById('oscillostep').value;
+			if (DEBUG) { console.log('moveOscillo n°'+num+" -> "+sens+" by "+steps+" / envoi socket oscillomove"); }
+			socket.emit('oscillomove', { oscillo: num, sens: sens, steps: steps} );
+		}
+
+		//envoi socket oscillomovelimit
+		function moveOscilloLimite(val) {
+			num = document.getElementById('oscillo').value;
+			if (DEBUG) { console.log('moveOscilloLimite '+num+" -> "+val+") envoi socket oscillomovelimite"); }
+			socket.emit('oscillomovelimite', { oscillo: num, limite: val} );
+		}
+
+		//init le champs Valeur
+		function getValeur() {
+			num = document.getElementById('oscillo').value;
+			document.getElementById('valeur').value = eval('oscillo'+num).value;
+		}
+
+		//init le champs Valeur
+		function getValeurRalenti() {
+			num = document.getElementById('oscillo').value;
+			title =  eval('oscillo'+num).options.title;
+			ralenti = parseInt(title.replace("@ ",""));
+			//alert(ralenti);
+			document.getElementById('ralenti').value = ralenti;
+		}
+
+		//save
+		function save() {
+			getValeur();
+			num = document.getElementById('oscillo').value;
+			limite = document.getElementById('limite').value;
+			valeur = document.getElementById('valeur').value;
+			ralenti = document.getElementById('ralenti').value;
+			//alert("Save oscillo:"+num+" limite:"+limite+" val:"+valeur+"ralenti:"+ralenti);
+			socket.emit('save', { oscillo: num, limite: limite, value: valeur, ralenti: ralenti} );
+		}
+	</script>
+
+  </body>
+</html>
