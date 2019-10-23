@@ -154,7 +154,10 @@ pwm.outputEnable();
 /*** Envoi infos page web ***/
 var loop = setInterval(function(){
     infos_obj = {
-        "blabla"
+        oscillo1: { pos: servo.getPosition(1,250), ralenti: OSCILLO[0].ralenti, start: OSCILLO[0].start, stop: OSCILLO[0].stop, state: OSCILLO_STATE[0] },
+        oscillo2: { pos: servo.getPosition(2,250), ralenti: OSCILLO[1].ralenti, start: OSCILLO[1].start, stop: OSCILLO[1].stop, state: OSCILLO_STATE[1] },
+        oscillo3: { pos: servo.getPosition(3,250), ralenti: OSCILLO[2].ralenti, start: OSCILLO[2].start, stop: OSCILLO[2].stop, state: OSCILLO_STATE[2] },
+        oscillo4: { pos: servo.getPosition(4,250), ralenti: OSCILLO[3].ralenti, start: OSCILLO[3].start, stop: OSCILLO[3].stop, state: OSCILLO_STATE[3] }
     }; 
     io.sockets.emit('oscillator', {infos:infos_obj} );
 }, CHECK_PERIOD * 1000)
