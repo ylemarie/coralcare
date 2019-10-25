@@ -23,12 +23,14 @@ function setParam( pname, newValue ) {
 //populate "const"
 var CHECK_PERIOD = getParam('CHECK_PERIOD');    // used ?
 var SERVER_PORT = getParam('SERVER_PORT');      // http server port
-var DEBUG = 0;//getParam('DEBUG');                  // debug mode
+var DEBUG = getParam('DEBUG');                  // debug mode
 var LOG = getParam('LOG');                      // log mode
 var TPS = getParam('TPS');                      // Time Periods definition
 var ON  = 1;
 var OFF = 0;
 var STATE = ON;                                 // running mode
+var MAX_PWM = 16;                               // max PWM on servoPi: Blue=>Pin1-Pin8 / White=>Pin=9-Pin16
+var MAX_LED = MAX_PWM/2;                        // 2 Chanel (blue/white) / CoralCare
 
 if (DEBUG) { 
     console.log("Nbr parameters: "+parameters.length); 
@@ -171,8 +173,14 @@ function dimmingAuto() {
     var tp = getTP( now_hour );                 //check Time Period
     if (DEBUG) { console.log('Ratio wanted',ratio); }
 
-    setPwmLed(pwm, 1, ratio.blue);
-    setPwmLed(pwm, 2, ratio.white);
+    //setPwmLed(pwm, 1, ratio.blue);
+    //setPwmLed(pwm, 2, ratio.white);
+    for (var i=1; i<=MAX_LED; i++) {
+        //set PWM of Blue
+        setPwmLed(pwm, i, ratio.blue);
+        //set PWM of White
+        setPwmLed(pwm, i+MAX_LED, ratio.white);
+    }
 
     var tp_hour = "("+tp.tp1.hour+"-"+tp.tp2.hour+")";
     var tp_infos = " [B:"+tp.tp1.blue +"%-"+tp.tp2.blue+"% W:"+tp.tp1.white +"%-"+tp.tp2.white+"%]";
