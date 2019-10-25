@@ -23,9 +23,12 @@ function setParam( pname, newValue ) {
 //populate "const"
 var CHECK_PERIOD = getParam('CHECK_PERIOD');    // used ?
 var SERVER_PORT = getParam('SERVER_PORT');      // http server port
-var DEBUG = getParam('DEBUG');                  // debug mode
+var DEBUG = 0;//getParam('DEBUG');                  // debug mode
 var LOG = getParam('LOG');                      // log mode
 var TPS = getParam('TPS');                      // Time Periods definition
+var ON  = 1;
+var OFF = 0;
+var STATE = ON;                                 // running mode
 
 if (DEBUG) { 
     console.log("Nbr parameters: "+parameters.length); 
@@ -48,7 +51,7 @@ var twix       = require('twix');              //http://isaaccambron.com/twix.js
 var dateFormat = require('dateformat');        //https://github.com/felixge/node-dateformat
 
 
-/*** TIME PERIOD ***/
+/*** TIME PERIOD & PWM ***/
 
 //get ratio pwm for 1 specific hour
 function getPwm(hour) { 
@@ -151,135 +154,68 @@ var pwm = new ServoPi(0x40);    // create an servopi object
 pwm.setPWMFrequency(1000);      // Set PWM frequency to 1 Khz and enable the output
 pwm.outputEnable();
 
+//PWM Canal Led
+function setPwmLed(pwm, num, brightness) {
+    //if (DEBUG) { console.log('setPwmLed(pwm, num:'+num+' ,brightness:'+brightness+')'); }
+    pwm_bright = Math.round(4095 - brightness * 4095 / 100);    //inverse for LDD SureElectronic
+    pwm.setPWM(num, 0, pwm_bright);                             //pin 1-16)
+    if (DEBUG) { console.log(num+'-auto) brightness='+brightness+'% pwm='+pwm_bright); }
+}
+
 /*** Envoi infos page web ***/
-var loop = setInterval(function(){
+var loop = setInterval(dimmingAuto, CHECK_PERIOD * 1000);
+function dimmingAuto() {
+    var now = new Date();
+    var now_hour = dateFormat(now, "HH:MM");
+    var ratio = getPwm( now_hour );             //check Time Period Ratio
+    var tp = getTP( now_hour );                 //check Time Period
+    if (DEBUG) { console.log('Ratio wanted',ratio); }
+
+    setPwmLed(pwm, 1, ratio.blue);
+    setPwmLed(pwm, 2, ratio.white);
+
+    var tp_hour = "("+tp.tp1.hour+"-"+tp.tp2.hour+")";
+    var tp_infos = " [B:"+tp.tp1.blue +"%-"+tp.tp2.blue+"% W:"+tp.tp1.white +"%-"+tp.tp2.white+"%]";
+
     infos_obj = {
-        oscillo1: { pos: servo.getPosition(1,250), ralenti: OSCILLO[0].ralenti, start: OSCILLO[0].start, stop: OSCILLO[0].stop, state: OSCILLO_STATE[0] },
-        oscillo2: { pos: servo.getPosition(2,250), ralenti: OSCILLO[1].ralenti, start: OSCILLO[1].start, stop: OSCILLO[1].stop, state: OSCILLO_STATE[1] },
-        oscillo3: { pos: servo.getPosition(3,250), ralenti: OSCILLO[2].ralenti, start: OSCILLO[2].start, stop: OSCILLO[2].stop, state: OSCILLO_STATE[2] },
-        oscillo4: { pos: servo.getPosition(4,250), ralenti: OSCILLO[3].ralenti, start: OSCILLO[3].start, stop: OSCILLO[3].stop, state: OSCILLO_STATE[3] }
-    }; 
-    io.sockets.emit('oscillator', {infos:infos_obj} );
-}, CHECK_PERIOD * 1000)
+        ratio,
+        tp_infos,
+        tp_hour,
+        now_hour
+    };
+    io.sockets.emit('coralcare', {infos:infos_obj} );
+}
 
 /*** Ecoute socket de page web */
 io.sockets.on('connection', function (socket) {
     //debug
     socket.emit('message', 'Vous êtes bien connecté !');
 
-    // Quand le serveur reçoit un signal de type "startstop" du client    
-    socket.on('startstop', function (data) {
-        //console.log('Un client me parle ! Il me dit : ' + data);
-        state = data.state;
-        console.log("Socket startstop state:"+state);
-        if (state == ON) {
-            console.log("STOP");
-            /*
-            for (i=0; i<NB_OSCILLOS; i++) {
-                OSCILLO_STATE[i] = OFF;
-                console.log("move servo "+(i+1)+" to "+OSCILLO_START[i]);
-            }
-            resetPos = setInterval(function() {
-                console.log("resetPos");
-                servo.move(1, OSCILLO[0].start, 250);
-                servo.move(2, OSCILLO[1].start, 250);
-                servo.move(3, OSCILLO[2].start, 250);
-                servo.move(4, OSCILLO[3].start, 250);
-            }, 1000);
-            //servo.sleep();  //pas la peine c'est le move ave STATE OFF qui les bloque
-            */
-        } else { //OFF
-            console.log("START");
-            /*
-            for (i=0; i<NB_OSCILLOS; i++) {
-                OSCILLO_STATE[i] = ON;
-            }
-            */
-            console.log("clear resetPos");
-            clearInterval(resetPos);
-            //servo.wake();
+    // Quand le serveur reçoit un signal de type "onoff" du client    
+    socket.on('onoff', function (data) {
+        STATE = data.state;
+        //if (DEBUG) { console.log("Socket onoff state:"+STATE); }
+        if (STATE == OFF) {
+            if (LOG) { console.log("STOP loop"); }
+            clearInterval(loop);
+        } else { //OFF loop
+            if (LOG) { console.log("START loop"); }
+            loop = setInterval(dimmingAuto, CHECK_PERIOD * 1000);
         }
     }); 
 
-    socket.on('oscillomove', function (data) {
-        num = data.oscillo;
-        sens = data.sens;
-        steps = data.steps;
-        console.log("Socket oscillomove num:"+num+" sens:"+sens+" steps:"+steps);
-        if (OSCILLO_STATE[0] == OFF) { //ts les oscillos dans le meme état
-            console.log("clear resetPos depuis oscillomove");
-            clearInterval(resetPos);
-
-            destination = servo.getPosition(num, 250) + steps*sens;
-            console.log("destination:"+destination);
-            if (destination >= 250) {
-                destination = 250;
-                console.log("Max 250!");
-            }
-            if (destination <= 1) {
-                destination = 1;
-                console.log("Mini 1!");
-            }         
-            servo.move(num, destination, 250);
+    socket.on('chanelmove', function (data) {
+        num = data.chanel;
+        ratio = data.ratio;
+        STATE = data.state;
+        if (LOG) { console.log("Socket chanelmove num:"+num+" ratio:"+ratio+" STATE:"+STATE); }
+        if (STATE == OFF) {
+            if (LOG) { console.log("setPwmLed(pwm,"+num+","+ratio+")"); }
+            setPwmLed(pwm, num, ratio);
         } else { //ON
-            console.log("Can't move oscillos ON");
+            console.log("PB chanelmove STATE=ON !!!");
         }
     });
-
-    socket.on('oscillomovelimite', function (data) {
-        num = data.oscillo;
-        limite = data.limite;
-        console.log("Socket oscillomovelimite num:"+num+" limite:"+limite);
-        if (OSCILLO_STATE[0] == OFF) { //ts les oscillos dans le meme état
-            console.log("clear resetPos depuis oscillomovelimite");
-            clearInterval(resetPos);
-
-            destination = limite;
-            console.log("destination:"+destination);
-            if (destination >= 250) {
-                destination = 250;
-                console.log("Max 250!");
-            }
-            if (destination <= 1) {
-                destination = 1;
-                console.log("Mini 1!");
-            }
-            servo.move(num, destination, 250);
-        } else { //ON
-            console.log("Can't move oscillos ON");
-        }
-    });
-
-    socket.on('save', function (data) {
-        num = parseInt(data.oscillo);
-        limite = data.limite;
-        val = parseInt(data.value);
-        ralenti = parseInt(data.ralenti);
-        console.log("Socket save num:"+num+" limite:"+limite+" val:"+val+" ralenti:"+ralenti);
-        //setParam( "CHECK_PERIOD", CHECK_PERIOD );
-        //setParam( "SERVER_PORT", SERVER_PORT );
-        //setParam( "DEBUG", DEBUG );
-        //setParam( "LOG", LOG );
-        switch (limite) {
-            case "start" : OSCILLO[num-1].start = val; break;
-            case "stop" :  OSCILLO[num-1].stop  = val; break;
-        }
-        OSCILLO[num-1].ralenti = ralenti;
-        setParam( "OSCILLO", OSCILLO );
-        //setParam( "ADJUST_STEP", ADJUST_STEP );
-        jsonfile.writeFileSync(file, parameters);
-        if (DEBUG) { console.log( jsonfile.readFileSync(file) ); }        
-  
-        //reinit les servo car les ralenti ont peut-être changes
-        clearInterval(myServo[0]);
-        clearInterval(myServo[1]);
-        clearInterval(myServo[2]);
-        clearInterval(myServo[3]);
-        myServo[0] = setInterval(function() { moveServo(1) }, OSCILLO[0].ralenti); //servo 1 = OSCILLO[0]
-        myServo[1] = setInterval(function() { moveServo(2) }, OSCILLO[1].ralenti);
-        myServo[2] = setInterval(function() { moveServo(3) }, OSCILLO[2].ralenti);
-        myServo[3] = setInterval(function() { moveServo(4) }, OSCILLO[3].ralenti);  
-    });    
 
 });
 

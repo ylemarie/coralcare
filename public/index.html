@@ -1,246 +1,295 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
-	<title>Oscillator</title>
+	<title>Coral Care</title>
 	<meta name="viewport" content="width=400" />
 	
 	<script src="socket.io/socket.io.js"></script>
 	<script src="gauge.min.js"></script>
+	<script src="nouislider.js"></script>
+	<script src="wNumb.js"></script>
 
-	<link rel="stylesheet" href="slider.css">
+	<link rel="stylesheet" href="nouislider.css">
 	<link rel="stylesheet" href="yle.css">
-	<style>
-	body {
-		color: #000;
-		background:  #fff;
-	}
+	
+	<style type="text/css">
+		#titre {
+			background-color: powderblue;
+		}
+		body {
+			color: #000;
+			background:  #fff;
+		}
+		#chanel1,#chanel2 {
+			margin-left: auto;
+    		margin-right: auto;
+		}
+		#chanel2 {
+    		margin-top: -100px;
+		}		
+		#switch_reglage {
+			float: right;
+		}
+		#slider1,#slider2 {
+			margin-top: 50px;
+			margin-bottom: 50px;
+			margin-left: 30px;
+			margin-right: 30px;
+		}
+		#slider1 {
+			background-color: yellow;
+		}
+		#slider2 {
+			background-color: blue;
+		}
+		#lockbutton {
+			margin: 0;
+			float: left;
+		}
+		.noUi-tooltip {
+	    /*	display: none; */
+		}
+		.noUi-active .noUi-tooltip {
+	    	display: block;
+		}	
+		#slider1-span, #slider2-span {
+			display: none;
+		}	
 	</style>
+	</head>
 
-  </head>
   <body>
   	<div id="header">
-    	<div id='titre'>Oscillator x4</div>
+    	<div id='titre'>Coral Care <span id='hour'> Auto</span></div>
     </div>
     <div id="infos">
-    	<canvas id="oscillo1" onclick="startStop(1)"></canvas>
-	    <canvas id="oscillo2" onclick="startStop(2)"></canvas>
-	    <canvas id="oscillo3" onclick="startStop(3)"></canvas>
-	    <canvas id="oscillo4" onclick="startStop(4)"></canvas>
+    	<canvas id="chanel1"></canvas>
+	    <canvas id="chanel2"></canvas>
+	</div>
+	<div id="reglage" style="display: none">
+		<div id='slider1'></div><span id="slider1-span"></span>
+		<div id='slider2'></div><span id="slider2-span"></span>
+		<button id="lockbutton">lock</button>
 	</div>
 	<div>
-		<input type="image" class="oscilloswitch" id="oscilloswitch" value="xxx" src="on.png" onclick="switchOscillo(this.value)">
-		<div id="move" style="display: none">
-			<div>
-				<select id="oscillo">
-					<option value="1">Oscillo n°1</option>
-					<option value="2">Oscillo n°2</option>
-					<option value="3">Oscillo n°3</option>
-					<option value="4">Oscillo n°4</option>
-				</select>
-			</div>
-			<div id="oscillomove">
-				Déplacer:
-				<input type="image" class="oscilloswitch" id="oscillorewind" src="rewind.png" onclick="moveOscilloLimite(1)">		
-				<input type="image" class="oscilloswitch" id="oscillomoins" src="moins.png" onclick="moveOscillo(-1)">		
-				<input type="number" class="oscilloswitch" id="oscillostep" value="1">
-				<input type="image" class="oscilloswitch" id="oscilloplus" src="plus.png"  onclick="moveOscillo(1)">				
-				<input type="image" class="oscilloswitch" id="oscillofastforward" src="fastforward.png" onclick="moveOscilloLimite(250)">											
-			</div>
-		</div>
-		<div id="reglage" style="display: none">
-			<div id="limiteval">
-				Définir limites: 
-				<select id="limite">
-					<option value="start">Start</option>
-					<option value="stop">Stop</option>
-				</select>
-				<input type="text" id="valeur" value="xxx" disabled="disabled">
-			</div>
-			<div>
-				<input type="image" class="oscilloswitch" id="getval" src="info.png"  onclick="getValeur()">
-			</div>
-			<div id="vitesse">
-				Ralenti:
-				<input type="number" class="oscilloswitch" id="ralenti" value="" min="75">
-			</div>
-			<div id="inforalenti">
-				<input type="image" class="oscilloswitch" id="getvalralenti" src="info.png"  onclick="getValeurRalenti()">			
-			</div>
-			<div>
-				<input type="image" class="oscilloswitch" id="save" src="save.png"  onclick="save()">							
-			</div>
-	</div>
-<script>
+		<input type="image" class="reglage" id="switch_reglage" value="ON" src="on.png" onclick="switchReglage(this.value)">
+	</div>	
 
-var oscillo1 = new RadialGauge({
-    renderTo: 'oscillo1',
-    units: 'Oscillo',
-    title: 'n° 1',
-});
-oscillo1.value = 5; 
+<script type="text/javascript">
 
-var oscillo2 = new RadialGauge({
-    renderTo: 'oscillo2',
-    units: 'Oscillo',
-    title: 'n° 2',
-});
-oscillo2.value = 50; 
-
-var oscillo3 = new RadialGauge({
-    renderTo: 'oscillo3',
-    units: 'Oscillo',
-    title: 'n° 3',
-});
-oscillo3.value = 100; 
-
-var oscillo4 = new RadialGauge({
-    renderTo: 'oscillo4',
-    units: 'Oscillo',
-    title: 'n° 4',
-});
-oscillo4.value = 150; 
-
-document.gauges.forEach(function (gauge) {
-	gauge.update({
+	var chanel1 = new RadialGauge({
+	    renderTo: 'chanel1',
+	    title: '% White',
 	    width: 300,
 	    height: 300,
 	    minValue: 0,
-	    maxValue: 250,
-	    majorTicks: [0,25,50,75,100,125,150,175,200,225,250],
+	    maxValue: 100,
+	    startAngle: 90,
+	    ticksAngle: 180,
+	    valueBox: false,
+	    majorTicks: ["0","10","20","30","40","50","60","70","80","90","100"],
 	    minorTicks: 2,
 	    strokeTicks: true,
-	    highlights: [ 
-	        { from:   0, to: 125, color: 'rgba(200,50,50,.75)' },
-	        { from: 125, to: 250, color: 'rgba(0,128,0,.75)' }
+	    highlights: [
+	    	{ "from":  0, "to": 20, "color": "#FFFFCC" },			/* perbang.dk/rgbgradient/ */
+	    	{ "from": 20, "to": 40, "color": "#FFFF99" },
+	    	{ "from": 40, "to": 60, "color": "#FFFF66" },
+	    	{ "from": 60, "to": 80, "color": "#FFFF33" },
+	        { "from": 80, "to":100, "color": "#FFFF00" }
 	    ],
-	    ticksAngle: 180,
-	    startAngle: 180,
-	    colorMajorTicks: '#ddd',
-	    colorMinorTicks: '#ddd',
-	    colorTitle: '#eee',
-	    colorUnits: '#ccc',
-	    colorNumbers: '#eee',
-	    colorPlate: '#222',
+	    colorPlate: "#fff",
 	    borderShadowWidth: 0,
-	    borders: true,
-	    needleType: 'line',
-	    needleStart: 75,
-	    needleEnd: 99,
-	    needleWidth: 3,        
-	    animationDuration: 500,
-	    animationRule: 'linear',
-	    animationTarget: 'plate',
-	    colorBorderOuter: '#333',
-	    colorBorderOuterEnd: '#111',
-	    colorBorderMiddle: '#222',
-	    colorBorderMiddleEnd: '#111',
-	    colorBorderInner: '#111',
-	    colorBorderInnerEnd: '#333',
-	    colorNeedleShadowDown: '#333',
-	    colorNeedleCircleOuter: '#333',
-	    colorNeedleCircleOuterEnd: '#111',
-	    colorNeedleCircleInner: '#111',
-	    colorNeedleCircleInnerEnd: '#222',
-	    valueBoxBorderRadius: 0,
-	    colorValueBoxRect: '#222',
-	    colorValueBoxRectEnd: '#333'
-	})
-});
+	    borders: false,
+	    needleType: "arrow",
+	    needleWidth: 2,
+	    needleCircleSize: 7,
+	    needleCircleOuter: true,
+	    needleCircleInner: false,
+	    animationDuration: 1500,
+	    animationRule: "linear"    
+	});
+	//chanel1.value = 5; 
+
+	var chanel2 = new RadialGauge({
+	    renderTo: 'chanel2',
+	    title: '% Blue',
+	    width: 300,
+	    height: 300,
+	    minValue: 0,
+	    maxValue: 100,
+	    startAngle: 90,
+	    ticksAngle: 180,
+	    valueBox: false,
+	    majorTicks: ["0","10","20","30","40","50","60","70","80","90","100"],
+	    minorTicks: 2,
+	    strokeTicks: true,
+	    highlights: [
+	    	{ "from":  0, "to": 20, "color": "#ADB4FF" },			/* perbang.dk/rgbgradient/ */
+	    	{ "from": 20, "to": 40, "color": "#8B90F2" },
+	    	{ "from": 40, "to": 60, "color": "#595ADF" },
+	    	{ "from": 60, "to": 80, "color": "#2624CB" },
+	        { "from": 80, "to":100, "color": "#0500BF" }
+	    ],
+	    colorPlate: "#fff",
+	    borderShadowWidth: 0,
+	    borders: false,
+	    needleType: "arrow",
+	    needleWidth: 2,
+	    needleCircleSize: 7,
+	    needleCircleOuter: true,
+	    needleCircleInner: false,
+	    animationDuration: 1500,
+	    animationRule: "linear"    
+	});
+	//chanel2.value = 50; 
+
+	var socket = io.connect();
+	var DEBUG = 1;	//Debug
+	var ON = 1;
+	var OFF = 0;
+
+	//debug
+    socket.on('message', function(message) {
+        console.log('Le serveur a un message pour vous : ' + message);
+    })
+
+	//ecoute socket coralcare
+	socket.on('coralcare', function(data) {				
+		if (DEBUG) console.log(data);
+		chanel1.update({
+			value: data.infos.ratio.white,
+			title: data.infos.ratio.white + "% White"
+		});
+		chanel2.update({
+			value: data.infos.ratio.blue,
+			title: data.infos.ratio.blue + "% Blue"			
+		});
+		//if (DEBUG) console.log(data.infos.now_hour);
+		document.getElementById('hour').innerHTML = data.infos.now_hour + " " + data.infos.tp_hour + "<br>" + data.infos.tp_infos;
+	});			
+	
+	//envoi socket onoff
+	function switchReglage(value) {
+		if (DEBUG) { console.log('switchReglage('+value+") envoi socket onoff"); }
+		if (value == "ON") {
+			document.getElementById('switch_reglage').src = "off.png";
+			document.getElementById('switch_reglage').value = "OFF";
+			document.getElementById('chanel1').style = "display:none";
+			document.getElementById('chanel2').style = "display:none";
+			document.getElementById('reglage').style = "display:block";
+			document.getElementById('hour').innerHTML = "Manual";
+
+			console.log("chanel1="+chanel1.value);
+			slider1.noUiSlider.set(chanel1.value);
+			console.log("chanel2="+chanel2.value);
+			slider2.noUiSlider.set(chanel2.value);
+
+			socket.emit('onoff', { state: OFF} );
+
+		} else {
+			document.getElementById('switch_reglage').src = "on.png";
+			document.getElementById('switch_reglage').value = "ON";
+			document.getElementById('chanel1').style = "display:block";
+			document.getElementById('chanel2').style = "display:block";			
+			document.getElementById('reglage').style = "display:none";
+
+			socket.emit('onoff', { state: ON} );
+		}
+	}
+
+	// slider reglage
+	var lockedState = false;
+	var lockedSlider = false;
+	var lockedValues = [60, 80];
+
+	var slider1 = document.getElementById('slider1');
+	var slider2 = document.getElementById('slider2');
+
+	var lockButton = document.getElementById('lockbutton');
+	var slider1Value = document.getElementById('slider1-span');
+	var slider2Value = document.getElementById('slider2-span');
+
+	// When the button is clicked, the locked state is inverted.
+	lockButton.addEventListener('click', function () {
+	    lockedState = !lockedState;
+	    this.textContent = lockedState ? 'unlock' : 'lock';
+	});
+
+	//The Crossupdate function
+	function crossUpdate(value, slider) {
+
+	    // If the sliders aren't interlocked, don't
+	    // cross-update.
+	    if (!lockedState) return;
+
+	    // Select whether to increase or decrease
+	    // the other slider value.
+	    var a = slider1 === slider ? 0 : 1;
+
+	    // Invert a
+	    var b = a ? 0 : 1;
+
+	    // Offset the slider value.
+	    value -= lockedValues[b] - lockedValues[a];
+
+	    // Set the value
+	    slider.noUiSlider.set(value);
+	}
+
+	//Initializing the sliders
+	noUiSlider.create(slider1, {
+	    start: 50,
+	    step: 1,
+		tooltips: [true],
+	    animate: false,
+	    format: wNumb({ decimals: 0 }),
+	    range: { min: 0, max: 100 }
+	});
+
+	noUiSlider.create(slider2, {
+	    start: 50,
+	    step: 1,
+	    tooltips: [true],
+	    animate: false,
+	    format: wNumb({ decimals: 0 }),
+	    range: { min: 0, max: 100 }
+	});
+
+	slider1.noUiSlider.on('update', function (values, handle) {
+	    slider1Value.innerHTML = values[handle];
+	    if (document.getElementById("switch_reglage").value=="OFF") {
+		    if (DEBUG) { console.log("movechanel n°1 -> "+values[handle]+" / envoi socket chanelmove"); }
+			socket.emit('chanelmove', { chanel: 1, ratio: values[handle], state: OFF} );
+		}
+	});
+
+	slider2.noUiSlider.on('update', function (values, handle) {
+	    slider2Value.innerHTML = values[handle];
+	    if (document.getElementById("switch_reglage").value=="OFF") {
+	    	if (DEBUG) { console.log("movechanel n°2 -> "+values[handle]+" / envoi socket chanelmove"); }
+			socket.emit('chanelmove', { chanel: 2, ratio: values[handle], state:OFF} );	    
+		}
+	});
+	//Linking the sliders together
+	function setLockedValues() {
+	    lockedValues = [
+	        Number(slider1.noUiSlider.get()),
+	        Number(slider2.noUiSlider.get())
+	    ];
+	}
+
+	slider1.noUiSlider.on('change', setLockedValues);
+	slider2.noUiSlider.on('change', setLockedValues);
+
+	slider1.noUiSlider.on('slide', function (values, handle) {
+	    crossUpdate(values[handle], slider2);
+	});
+
+	slider2.noUiSlider.on('slide', function (values, handle) {
+	    crossUpdate(values[handle], slider1);
+	});
 
 </script>
-<!-- ******************************* -->
-	<script type="text/javascript">		
-		var socket = io.connect();
-		var DEBUG = 1;	//Debug
-		var ON = 1;
-		var OFF = 0;
-
-		//debug
-	    socket.on('message', function(message) {
-	        console.log('Le serveur a un message pour vous : ' + message);
-	    })
-
-		//ecoute socket oscillator
-		socket.on('oscillator', function(data) {				
-			if (DEBUG) console.log(data);
-			oscillo1.value = data.infos.oscillo1.pos;
-			oscillo1.update({title:"@ " + data.infos.oscillo1.ralenti});
-			oscillo1.update({units: data.infos.oscillo1.start + " - " + data.infos.oscillo1.stop});
-
-			oscillo2.value = data.infos.oscillo2.pos;
-			oscillo2.update({title:"@ " + data.infos.oscillo2.ralenti});
-			oscillo2.update({units: data.infos.oscillo2.start + " - " + data.infos.oscillo2.stop});
-
-			oscillo3.value = data.infos.oscillo3.pos;
-			oscillo3.update({title:"@ " + data.infos.oscillo3.ralenti});
-			oscillo3.update({units: data.infos.oscillo3.start + " - " + data.infos.oscillo3.stop});
-
-			oscillo4.value = data.infos.oscillo4.pos;
-			oscillo4.update({title:"@ " + data.infos.oscillo4.ralenti});
-			oscillo4.update({units: data.infos.oscillo4.start + " - " + data.infos.oscillo4.stop});
-
-			document.getElementById('oscilloswitch').value = data.infos.oscillo1.state;	//les 4 oscillo start/stop en meme temps
-
-		});			
-		
-		//envoi socket startStop
-		function switchOscillo(value) {
-			if (DEBUG) { console.log('switchOscillo('+value+") envoi socket startstop"); }
-			socket.emit('startstop', { state: value} );
-			if (value == ON) {
-				document.getElementById('oscilloswitch').src = "off.png";
-				document.getElementById('move').style = "display:block";
-				document.getElementById('reglage').style = "display:block";
-
-			} else {
-				document.getElementById('oscilloswitch').src = "on.png";			
-				document.getElementById('move').style = "display:none";
-				document.getElementById('reglage').style = "display:none";
-
-			}
-		}
-
-		//envoi socket oscillomove
-		function moveOscillo(sens) {
-			num = document.getElementById('oscillo').value;
-			steps = document.getElementById('oscillostep').value;
-			if (DEBUG) { console.log('moveOscillo n°'+num+" -> "+sens+" by "+steps+" / envoi socket oscillomove"); }
-			socket.emit('oscillomove', { oscillo: num, sens: sens, steps: steps} );
-		}
-
-		//envoi socket oscillomovelimit
-		function moveOscilloLimite(val) {
-			num = document.getElementById('oscillo').value;
-			if (DEBUG) { console.log('moveOscilloLimite '+num+" -> "+val+") envoi socket oscillomovelimite"); }
-			socket.emit('oscillomovelimite', { oscillo: num, limite: val} );
-		}
-
-		//init le champs Valeur
-		function getValeur() {
-			num = document.getElementById('oscillo').value;
-			document.getElementById('valeur').value = eval('oscillo'+num).value;
-		}
-
-		//init le champs Valeur
-		function getValeurRalenti() {
-			num = document.getElementById('oscillo').value;
-			title =  eval('oscillo'+num).options.title;
-			ralenti = parseInt(title.replace("@ ",""));
-			//alert(ralenti);
-			document.getElementById('ralenti').value = ralenti;
-		}
-
-		//save
-		function save() {
-			getValeur();
-			num = document.getElementById('oscillo').value;
-			limite = document.getElementById('limite').value;
-			valeur = document.getElementById('valeur').value;
-			ralenti = document.getElementById('ralenti').value;
-			//alert("Save oscillo:"+num+" limite:"+limite+" val:"+valeur+"ralenti:"+ralenti);
-			socket.emit('save', { oscillo: num, limite: limite, value: valeur, ralenti: ralenti} );
-		}
-	</script>
 
   </body>
 </html>
