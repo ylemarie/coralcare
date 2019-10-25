@@ -69,7 +69,8 @@
 	<div id="reglage" style="display: none">
 		<div id='slider1'></div><span id="slider1-span"></span>
 		<div id='slider2'></div><span id="slider2-span"></span>
-		<button id="lockbutton">lock</button>
+		<!-- <button id="lockbutton">lock</button> -->
+		<input id="lockbutton" type="image" src="unlock.png">
 	</div>
 	<div>
 		<input type="image" class="reglage" id="switch_reglage" value="ON" src="on.png" onclick="switchReglage(this.value)">
@@ -212,7 +213,8 @@
 	// When the button is clicked, the locked state is inverted.
 	lockButton.addEventListener('click', function () {
 	    lockedState = !lockedState;
-	    this.textContent = lockedState ? 'unlock' : 'lock';
+	    //this.textContent = lockedState ? 'unlock' : 'lock';
+	    this.src = lockedState ? 'lock.png' : 'unlock.png';
 	});
 
 	//The Crossupdate function
