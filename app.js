@@ -176,8 +176,7 @@ function buildGraph() {
         pwmW[i] = ratio.white;
         pwmB[i] = ratio.blue;
     }
-    console.log("White"+pwmW);
-    console.log("Blue"+pwmB);
+    socket.emit("graph",{blue:pwmB,white:pwmW})
 }
 
 /*** Envoi infos page web ***/
@@ -213,8 +212,10 @@ function dimmingAuto() {
 /*** Ecoute socket de page web */
 io.sockets.on('connection', function (socket) {
     //debug
-    buildGraph();
     socket.emit('message', 'Vous êtes bien connecté !');
+
+    //buildGraph & emit socket
+    buildGraph();
 
     // Quand le serveur reçoit un signal de type "onoff" du client    
     socket.on('onoff', function (data) {
