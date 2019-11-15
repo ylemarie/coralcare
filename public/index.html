@@ -156,7 +156,7 @@
 
 	//ecoute socket coralcare
 	socket.on('coralcare', function(data) {				
-		if (DEBUG) console.log("socket coralcare !");
+		//if (DEBUG) console.log("socket coralcare !");
 		if (DEBUG) console.log(data);
 		chanel1.update({
 			value: data.infos.ratio.white,
@@ -170,13 +170,6 @@
 		document.getElementById('hour').innerHTML = data.infos.now_hour + " " + data.infos.tp_hour + "<br>" + data.infos.tp_infos;
 	});			
 	
-	//ecoute socket graph
-    socket.on('graph', function(data) {
-    	if (DEBUG) console.log("socket graph !");
-    	if (DEBUG) console.log(data);
-        console.log(data);
-    })
-
 	//envoi socket onoff
 	function switchReglage(value) {
 		if (DEBUG) { console.log('switchReglage('+value+") envoi socket onoff"); }

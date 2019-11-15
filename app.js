@@ -170,7 +170,7 @@ function buildGraph() {
     var pwmB = [];
     var ratio;
 
-    if (1) { console.log('call buildGraph !'); }
+    //if (1) { console.log('call buildGraph !'); }
     for (var i=0; i<=24; i++) {
         if (i<10) { hour = "0" + i +":00" }
         else { hour = i +":00" }
