@@ -168,12 +168,13 @@ function setPwmLed(pwm, num, brightness) {
 function buildGraph() {
     var pwmW = {}
     var pwmB = {}
+    var ratio;
     for (var i=0; i<=24; i++) {
         if (i<10) { hour = "0" + i +":00" }
         else { hour = i +":00" }
-        pwm = getPwm(hour);
-        pwmW[i] = pwm.white;
-        pwmB[i] = pwm.blue;
+        ratio = getPwm(hour);
+        pwmW[i] = ratio.white;
+        pwmB[i] = ratio.blue;
     }
     console.log("White"+pwmW);
     console.log("Blue"+pwmB);
