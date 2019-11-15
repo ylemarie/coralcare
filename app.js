@@ -166,8 +166,8 @@ function setPwmLed(pwm, num, brightness) {
 
 //Build graph
 function buildGraph() {
-    var pwmW = {}
-    var pwmB = {}
+    var pwmW = [];
+    var pwmB = [];
     var ratio;
 
     if (1) { console.log('call buildGraph !'); }
@@ -178,7 +178,6 @@ function buildGraph() {
         pwmW[i] = ratio.white;
         pwmB[i] = ratio.blue;
     }
-
     return { blue:pwmB.toString(), white:pwmW.toString()}
 }
 
