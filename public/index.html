@@ -74,6 +74,12 @@
 		<!-- <button id="lockbutton">lock</button> -->
 		<input id="lockbutton" type="image" src="unlock.png">
 	</div>
+
+	<div class="chart-container" style="position: relative; height:40vh; width:80vw">
+	    <canvas id="myChart"></canvas>
+	</div>
+
+
 	<div>
 		<input type="image" class="reglage" id="switch_reglage" value="ON" src="on.png" onclick="switchReglage(this.value)">
 	</div>	
@@ -164,7 +170,9 @@
 		if (DEBUG) console.log(data);
 
 		graph_blue = data.infos.graph.blue;
+		if (DEBUG) console.log(graph_blue);
 		graph_white = data.infos.graph.white;
+		if (DEBUG) console.log(graph_white);
 
 		chanel1.update({
 			value: data.infos.ratio.white,
@@ -300,15 +308,7 @@
 	    crossUpdate(values[handle], slider1);
 	});
 
-</script>
-
-
-<!-- Graph begin -->
-<div class="chart-container" style="position: relative; height:40vh; width:80vw">
-    <canvas id="myChart"></canvas>
-</div>
-
-<script>
+// Graph begin
 	var heures = new Array();
 	for (var i=0; i<=24; i++)  {
 		if (i<10) {	zero = "0"; }
@@ -354,8 +354,10 @@
 	        }
 	    }
 	});
+// Graph end
+
 </script>
-<!-- Graph end -->
+
 
   </body>
 </html>
