@@ -156,8 +156,8 @@
 	var DEBUG = 1;	//Debug
 	var ON = 1;
 	var OFF = 0;
-	var graph_blue = "";
-	var graph_white = "";
+	var graph_blue = [];
+	var graph_white = [];
 
 	//debug
     socket.on('message', function(message) {
@@ -169,10 +169,12 @@
 		//if (DEBUG) console.log("socket coralcare !");
 		if (DEBUG) console.log(data);
 
-		graph_blue = data.infos.graph.blue;
-		if (DEBUG) console.log(graph_blue);
-		graph_white = data.infos.graph.white;
-		if (DEBUG) console.log(graph_white);
+		str_blue = data.infos.graph.blue;
+		graph_blue = str_blue.split(",");
+		//if (DEBUG) console.log(graph_blue);
+		str_white = data.infos.graph.white;
+		graph_white = str_white.split(",");
+		//if (DEBUG) console.log(graph_white);
 
 		chanel1.update({
 			value: data.infos.ratio.white,
@@ -335,12 +337,12 @@
 	            label: 'White %',
 	            backgroundColor: 'rgba(128, 128, 128, 0.2)',
 	            borderColor: 'rgba(128, 128, 128, 0.2)',
-	            data: [graph_white]
+	            data: graph_white
 	        },{
 	            label: 'Blue %',
 	            backgroundColor: 'rgba(0, 0, 255, 0.2)',
 	            borderColor: 'rgba(0, 0, 255, 0.2)',
-	            data: [graph_blue]
+	            data: graph_blue
 				}	
 	        ]
 	    },
