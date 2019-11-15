@@ -178,9 +178,7 @@ function buildGraph() {
         pwmW[i] = ratio.white;
         pwmB[i] = ratio.blue;
     }
-    for (var i = Things.length - 1; i >= 0; i--) {
-        Things[i]
-    }
+
     return { blue:pwmB.toString(), white:pwmW.toString()}
 }
 
