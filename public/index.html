@@ -156,6 +156,7 @@
 
 	//ecoute socket coralcare
 	socket.on('coralcare', function(data) {				
+		if (DEBUG) console.log("socket coralcare !");
 		if (DEBUG) console.log(data);
 		chanel1.update({
 			value: data.infos.ratio.white,
@@ -170,8 +171,10 @@
 	});			
 	
 	//ecoute socket graph
-    socket.on('graph', function(message) {
-        console.log('graph : ' + message);
+    socket.on('graph', function(data) {
+    	if (DEBUG) console.log("socket graph !");
+    	if (DEBUG) console.log(data);
+        console.log(data);
     })
 
 	//envoi socket onoff
