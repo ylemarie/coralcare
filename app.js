@@ -176,7 +176,7 @@ function buildGraph() {
         pwmW[i] = ratio.white;
         pwmB[i] = ratio.blue;
     }
-    io.sockets.emit("graph",{blue:pwmB,white:pwmW})
+    io.sockets.emit("graph",{graph: {blue:pwmB,white:pwmW} })
 }
 
 /*** Envoi infos page web ***/
@@ -243,7 +243,7 @@ io.sockets.on('connection', function (socket) {
 });
 
 //buildGraph & emit socket
-if (DEBUG) { console.log('call buildGraph !'); }
+if (1) { console.log('call buildGraph !'); }
 buildGraph();
 
 //End main program

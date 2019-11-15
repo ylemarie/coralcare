@@ -9,7 +9,7 @@
    },
    { 
       "name":"DEBUG",
-      "value":1
+      "value":0
    },
    { 
       "name":"LOG",
