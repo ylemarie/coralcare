@@ -8,6 +8,8 @@
 	<script src="gauge.min.js"></script>
 	<script src="nouislider.js"></script>
 	<script src="wNumb.js"></script>
+	<script src="chart.js/dist/Chart.min.js"></script>
+
 
 	<link rel="stylesheet" href="nouislider.css">
 	<link rel="stylesheet" href="yle.css">
@@ -148,6 +150,8 @@
 	var DEBUG = 1;	//Debug
 	var ON = 1;
 	var OFF = 0;
+	var graph_blue = "";
+	var graph_white = "";
 
 	//debug
     socket.on('message', function(message) {
@@ -158,6 +162,10 @@
 	socket.on('coralcare', function(data) {				
 		//if (DEBUG) console.log("socket coralcare !");
 		if (DEBUG) console.log(data);
+
+		graph_blue = data.graph.blue;
+		graph_white = data.graph.white;
+
 		chanel1.update({
 			value: data.infos.ratio.white,
 			title: data.infos.ratio.white + "% White"
@@ -293,6 +301,61 @@
 	});
 
 </script>
+
+
+<!-- Graph begin -->
+<div class="chart-container" style="position: relative; height:40vh; width:80vw">
+    <canvas id="myChart"></canvas>
+</div>
+
+<script>
+	var heures = new Array();
+	for (var i=0; i<=24; i++)  {
+		if (i<10) {	zero = "0"; }
+		else { zero = ""; }
+		heures[i] = zero + i + "h";
+	}
+
+	/* TODO AUTOMATIC */
+	/*
+	var pwmW = new Array();
+	var pwmB = new Array();
+	for (var i=0; i<=24; i++)  {
+		pwmW[i] = Math.floor(Math.random() * 100);
+		pwmB[i] = Math.floor(Math.random() * 100);
+	}*/
+	/* TODO AUTOMATIC */
+
+	ctx = document.getElementById('myChart');
+	var myChart = new Chart(ctx, {
+	    type: 'line',
+	    data: {
+	        labels: heures,
+	        datasets: [{
+	            label: 'White %',
+	            backgroundColor: 'rgba(128, 128, 128, 0.2)',
+	            borderColor: 'rgba(128, 128, 128, 0.2)',
+	            data: graph_white
+	        },{
+	            label: 'Blue %',
+	            backgroundColor: 'rgba(0, 0, 255, 0.2)',
+	            borderColor: 'rgba(0, 0, 255, 0.2)',
+	            data: graph_blue
+				}	
+	        ]
+	    },
+	    options: {
+	        scales: {
+	            yAxes: [{
+	                ticks: {
+	                    beginAtZero: true
+	                }
+	            }]
+	        }
+	    }
+	});
+</script>
+<!-- Graph end -->
 
   </body>
 </html>
