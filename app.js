@@ -214,9 +214,6 @@ io.sockets.on('connection', function (socket) {
     //debug
     socket.emit('message', 'Vous êtes bien connecté !');
 
-    //buildGraph & emit socket
-    buildGraph();
-
     // Quand le serveur reçoit un signal de type "onoff" du client    
     socket.on('onoff', function (data) {
         STATE = data.state;
@@ -245,4 +242,7 @@ io.sockets.on('connection', function (socket) {
 
 });
 
+//buildGraph & emit socket
+buildGraph();
+    
 //End main program
