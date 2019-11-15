@@ -1,9 +1,5 @@
 [ 
    { 
-      "name":"NB_OSCILLOS",
-      "value":4
-   },
-   { 
       "name":"CHECK_PERIOD",
       "value":1
    },
@@ -13,36 +9,11 @@
    },
    { 
       "name":"DEBUG",
-      "value":0
-   },
-   { 
-      "name":"LOG",
       "value":1
    },
    { 
-      "name":"OSCILLO",
-      "value":[ 
-         { 
-            "ralenti":35,
-            "start":1,
-            "stop":250
-         },
-         { 
-            "ralenti":149,
-            "start":12,
-            "stop":240
-         },
-         { 
-            "ralenti":253,
-            "start":20,
-            "stop":230
-         },
-         { 
-            "ralenti":600,
-            "start":30,
-            "stop":220
-         }
-      ]
+      "name":"LOG",
+      "value":0
    },
    { 
       "name":"TPS",
