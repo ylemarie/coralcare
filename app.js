@@ -169,6 +169,8 @@ function buildGraph() {
     var pwmW = {}
     var pwmB = {}
     var ratio;
+
+    if (1) { console.log('call buildGraph !'); }
     for (var i=0; i<=24; i++) {
         if (i<10) { hour = "0" + i +":00" }
         else { hour = i +":00" }
@@ -176,11 +178,15 @@ function buildGraph() {
         pwmW[i] = ratio.white;
         pwmB[i] = ratio.blue;
     }
-    io.sockets.emit("graph",{graph: {blue:pwmB,white:pwmW} })
+    for (var i = Things.length - 1; i >= 0; i--) {
+        Things[i]
+    }
+    return { blue:pwmB.toString(), white:pwmW.toString()} }
 }
 
 /*** Envoi infos page web ***/
 var loop = setInterval(dimmingAuto, CHECK_PERIOD * 1000);
+
 function dimmingAuto() {
     var now = new Date();
     var now_hour = dateFormat(now, "HH:MM");
@@ -200,12 +206,15 @@ function dimmingAuto() {
     var tp_hour = "("+tp.tp1.hour+"-"+tp.tp2.hour+")";
     var tp_infos = " [B:"+tp.tp1.blue +"%-"+tp.tp2.blue+"% W:"+tp.tp1.white +"%-"+tp.tp2.white+"%]";
 
+    graph = buildGraph();
     infos_obj = {
         ratio,
         tp_infos,
         tp_hour,
-        now_hour
+        now_hour,
+        graph
     };
+
     io.sockets.emit('coralcare', {infos:infos_obj} );
 }
 
@@ -241,9 +250,5 @@ io.sockets.on('connection', function (socket) {
     });
 
 });
-
-//buildGraph & emit socket
-if (1) { console.log('call buildGraph !'); }
-buildGraph();
 
 //End main program
