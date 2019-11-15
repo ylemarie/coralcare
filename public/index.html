@@ -169,6 +169,11 @@
 		document.getElementById('hour').innerHTML = data.infos.now_hour + " " + data.infos.tp_hour + "<br>" + data.infos.tp_infos;
 	});			
 	
+	//ecoute socket graph
+    socket.on('graph', function(message) {
+        console.log('graph : ' + message);
+    })
+
 	//envoi socket onoff
 	function switchReglage(value) {
 		if (DEBUG) { console.log('switchReglage('+value+") envoi socket onoff"); }
