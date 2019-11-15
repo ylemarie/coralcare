@@ -243,6 +243,7 @@ io.sockets.on('connection', function (socket) {
 });
 
 //buildGraph & emit socket
+if (DEBUG) { console.log('call buildGraph !'); }
 buildGraph();
-    
+
 //End main program
