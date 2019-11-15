@@ -164,6 +164,21 @@ function setPwmLed(pwm, num, brightness) {
     if (DEBUG) { console.log(num+'-auto) brightness='+brightness+'% pwm='+pwm_bright); }
 }
 
+//Build graph
+function buildGraph() {
+    var pwmW = {}
+    var pwmB = {}
+    for (var i=0; i<=24; i++) {
+        if (i<10) { hour = "0" + i +":00" }
+        else { hour = i +":00" }
+        pwm = getPwm(hour);
+        pwmW[i] = pwm.white;
+        pwmB[i] = pwm.blue;
+    }
+    console.log("White"+pwmW);
+    console.log("Blue"+pwmB);
+}
+
 /*** Envoi infos page web ***/
 var loop = setInterval(dimmingAuto, CHECK_PERIOD * 1000);
 function dimmingAuto() {
@@ -197,6 +212,7 @@ function dimmingAuto() {
 /*** Ecoute socket de page web */
 io.sockets.on('connection', function (socket) {
     //debug
+    buildGraph();
     socket.emit('message', 'Vous êtes bien connecté !');
 
     // Quand le serveur reçoit un signal de type "onoff" du client    
