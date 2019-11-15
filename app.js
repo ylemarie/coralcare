@@ -176,7 +176,7 @@ function buildGraph() {
         pwmW[i] = ratio.white;
         pwmB[i] = ratio.blue;
     }
-    socket.emit("graph",{blue:pwmB,white:pwmW})
+    io.sockets.emit("graph",{blue:pwmB,white:pwmW})
 }
 
 /*** Envoi infos page web ***/
