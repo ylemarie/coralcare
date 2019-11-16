@@ -75,7 +75,8 @@
 		<input id="lockbutton" type="image" src="unlock.png">
 	</div>
 
-	<div class="chart-container" style="position: relative; height:40vh; width:80vw">
+	<div class="chart-container" style="position: relative; height:40vh; width:80vw; margin-right: auto;
+    margin-left: auto; margin-top: -100px;">
 	    <canvas id="myChart"></canvas>
 	</div>
 
@@ -169,12 +170,26 @@
 		//if (DEBUG) console.log("socket coralcare !");
 		if (DEBUG) console.log(data);
 
+		//graph begin
 		str_blue = data.infos.graph.blue;
 		graph_blue = str_blue.split(",");
+		for (i=0; i<graph_blue.length; i++) {
+			graph_blue[i] = parseInt(graph_blue[i]);
+		}
+		//if (DEBUG) console.log("graph_blue updated");
 		//if (DEBUG) console.log(graph_blue);
+		myChart.data.datasets[1].data = graph_blue;
+
 		str_white = data.infos.graph.white;
 		graph_white = str_white.split(",");
+                for (i=0; i<graph_white.length; i++) {
+                        graph_white[i] = parseInt(graph_white[i]);
+                }
 		//if (DEBUG) console.log(graph_white);
+		myChart.data.datasets[0].data = graph_white;
+
+		myChart.update();
+		//graph end
 
 		chanel1.update({
 			value: data.infos.ratio.white,
@@ -311,6 +326,8 @@
 	});
 
 // Graph begin
+	if (DEBUG) console.log("Graph begin");
+
 	var heures = new Array();
 	for (var i=0; i<=24; i++)  {
 		if (i<10) {	zero = "0"; }
@@ -327,6 +344,9 @@
 		pwmB[i] = Math.floor(Math.random() * 100);
 	}*/
 	/* TODO AUTOMATIC */
+	if (DEBUG) console.log("graph_blue reading");
+    if (DEBUG) console.log(graph_blue);
+
 
 	ctx = document.getElementById('myChart');
 	var myChart = new Chart(ctx, {
@@ -343,7 +363,7 @@
 	            backgroundColor: 'rgba(0, 0, 255, 0.2)',
 	            borderColor: 'rgba(0, 0, 255, 0.2)',
 	            data: graph_blue
-				}	
+		}	
 	        ]
 	    },
 	    options: {

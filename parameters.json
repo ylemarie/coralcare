@@ -26,12 +26,12 @@
          { 
             "hour":"12:00",
             "blue":16,
-            "white":16
+            "white":25
          },
          { 
             "hour":"14:00",
             "blue":40,
-            "white":40
+            "white":50
          },
          { 
             "hour":"15:00",
