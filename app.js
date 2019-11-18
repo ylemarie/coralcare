@@ -239,8 +239,19 @@ io.sockets.on('connection', function (socket) {
         STATE = data.state;
         if (LOG) { console.log("Socket chanelmove num:"+num+" ratio:"+ratio+" STATE:"+STATE); }
         if (STATE == OFF) {
-            if (LOG) { console.log("setPwmLed(pwm,"+num+","+ratio+")"); }
-            setPwmLed(pwm, num, ratio);
+            //if (LOG) { console.log("setPwmLed(pwm,"+num+","+ratio+")"); }
+            //setPwmLed(pwm, num, ratio);
+            if (num==1) { //chanel 1 = white (pin 9-16)
+                for (i=9; i<=16; i++) {
+                    setPwmLed(pwm, i, ratio);
+                    if (1) { console.log("setPwmLed(pwm,"+i+","+ratio+")"); }
+                }
+            } else { //chanel 2 = white (pin 0-8)
+                for (i=1; i<=8; i++) {
+                    setPwmLed(pwm, i, ratio);
+                    if (1) { console.log("setPwmLed(pwm,"+i+","+ratio+")"); }
+                }
+            }
         } else { //ON
             console.log("PB chanelmove STATE=ON !!!");
         }

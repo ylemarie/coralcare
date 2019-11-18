@@ -211,6 +211,7 @@
 			document.getElementById('switch_reglage').value = "OFF";
 			document.getElementById('chanel1').style = "display:none";
 			document.getElementById('chanel2').style = "display:none";
+			document.getElementById('myChart').style = "display:none";
 			document.getElementById('reglage').style = "display:block";
 			document.getElementById('hour').innerHTML = "Manual";
 
@@ -226,6 +227,7 @@
 			document.getElementById('switch_reglage').value = "ON";
 			document.getElementById('chanel1').style = "display:block";
 			document.getElementById('chanel2').style = "display:block";			
+			document.getElementById('myChart').style = "display:block";	
 			document.getElementById('reglage').style = "display:none";
 
 			socket.emit('onoff', { state: ON} );
@@ -326,27 +328,13 @@
 	});
 
 // Graph begin
-	if (DEBUG) console.log("Graph begin");
-
+	//if (DEBUG) console.log("Graph begin");
 	var heures = new Array();
 	for (var i=0; i<=24; i++)  {
 		if (i<10) {	zero = "0"; }
 		else { zero = ""; }
 		heures[i] = zero + i + "h";
 	}
-
-	/* TODO AUTOMATIC */
-	/*
-	var pwmW = new Array();
-	var pwmB = new Array();
-	for (var i=0; i<=24; i++)  {
-		pwmW[i] = Math.floor(Math.random() * 100);
-		pwmB[i] = Math.floor(Math.random() * 100);
-	}*/
-	/* TODO AUTOMATIC */
-	if (DEBUG) console.log("graph_blue reading");
-    if (DEBUG) console.log(graph_blue);
-
 
 	ctx = document.getElementById('myChart');
 	var myChart = new Chart(ctx, {
@@ -363,8 +351,12 @@
 	            backgroundColor: 'rgba(0, 0, 255, 0.2)',
 	            borderColor: 'rgba(0, 0, 255, 0.2)',
 	            data: graph_blue
-		}	
-	        ]
+			}/*,{
+	            label: 'Now',
+	            backgroundColor: 'rgba(255, 0, 0, 0.2)',
+	            borderColor: 'rgba(255, 0, 0, 0.2)',
+	            data: [{x: 13, y: 0}, { x: 13, y: 50}]
+			}*/]
 	    },
 	    options: {
 	        scales: {
