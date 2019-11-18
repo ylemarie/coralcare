@@ -333,8 +333,27 @@
 	for (var i=0; i<=24; i++)  {
 		if (i<10) {	zero = "0"; }
 		else { zero = ""; }
-		heures[i] = zero + i + "h";
+		heures[i] = zero + i;// + "h";
 	}
+
+	//line current hour
+	var now = ['14'];
+	var annotations = now.map(function(date,index) {
+		return {
+			type: 'line',
+			id: 'vline' + index,
+			mode: 'vertical',
+			scaleID: 'x-axis-0',
+			value: date,
+			borderColor: 'red',
+			borderWidth: 2,
+			label: {
+				enabled: true,
+				position: "center",
+				content: now[index]
+			}
+		}
+	})
 
 	ctx = document.getElementById('myChart');
 	var myChart = new Chart(ctx, {
@@ -351,12 +370,7 @@
 	            backgroundColor: 'rgba(0, 0, 255, 0.2)',
 	            borderColor: 'rgba(0, 0, 255, 0.2)',
 	            data: graph_blue
-			}/*,{
-	            label: 'Now',
-	            backgroundColor: 'rgba(255, 0, 0, 0.2)',
-	            borderColor: 'rgba(255, 0, 0, 0.2)',
-	            data: [{x: 13, y: 0}, { x: 13, y: 50}]
-			}*/]
+			}]
 	    },
 	    options: {
 	        scales: {
@@ -365,40 +379,15 @@
 	                    beginAtZero: true
 	                }
 	            }]
-	        }
-	    }
+	        },
+		    annotation: {
+		    	drawTime: 'afterDatasetsDraw',
+		    	annotations: annotations
+			}
+		}
 	});
 // Graph end
-
-//line now Begin
-window.onload = function() {
-  var ctx = document.getElementById("myChart").getContext("2d");
-  new Chart(ctx, {
-    type: "line",
-    data: chartData,
-    options: {
-      annotation: {
-        annotations: [
-          {
-            type: "line",
-            mode: "vertical",
-            scaleID: "x-axis-0",
-            value: "MAR",
-            borderColor: "red",
-            label: {
-              content: "TODAY",
-              enabled: true,
-              position: "top"
-            }
-          }
-        ]
-      }
-    }
-  });
-};
-//line now end
 </script>
-
 
   </body>
 </html>
