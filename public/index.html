@@ -182,9 +182,9 @@
 
 		str_white = data.infos.graph.white;
 		graph_white = str_white.split(",");
-                for (i=0; i<graph_white.length; i++) {
-                        graph_white[i] = parseInt(graph_white[i]);
-                }
+        for (i=0; i<graph_white.length; i++) {
+                graph_white[i] = parseInt(graph_white[i]);
+        }
 		//if (DEBUG) console.log(graph_white);
 		myChart.data.datasets[0].data = graph_white;
 
@@ -370,6 +370,33 @@
 	});
 // Graph end
 
+//line now Begin
+window.onload = function() {
+  var ctx = document.getElementById("myChart").getContext("2d");
+  new Chart(ctx, {
+    type: "line",
+    data: chartData,
+    options: {
+      annotation: {
+        annotations: [
+          {
+            type: "line",
+            mode: "vertical",
+            scaleID: "x-axis-0",
+            value: "MAR",
+            borderColor: "red",
+            label: {
+              content: "TODAY",
+              enabled: true,
+              position: "top"
+            }
+          }
+        ]
+      }
+    }
+  });
+};
+//line now end
 </script>
 
 
