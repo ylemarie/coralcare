@@ -159,7 +159,8 @@ pwm.outputEnable();
 //PWM Canal Led
 function setPwmLed(pwm, num, brightness) {
     //if (DEBUG) { console.log('setPwmLed(pwm, num:'+num+' ,brightness:'+brightness+')'); }
-    pwm_bright = Math.round(4095 - brightness * 4095 / 100);    //inverse for LDD SureElectronic
+    //pwm_bright = Math.round(4095 - brightness * 4095 / 100);    //inverse for LDD SureElectronic
+    pwm_bright = Math.round(brightness * 4095 / 100);
     pwm.setPWM(num, 0, pwm_bright);                             //pin 1-16)
     if (DEBUG) { console.log(num+'-auto) brightness='+brightness+'% pwm='+pwm_bright); }
 }

@@ -8,8 +8,8 @@
 	<script src="gauge.min.js"></script>
 	<script src="nouislider.js"></script>
 	<script src="wNumb.js"></script>
-	<script src="Chart.min.js"></script>
-
+	<script src="Chart.js"></script>
+	<script src="chartjs-plugin-annotation.js"></script>
 
 	<link rel="stylesheet" href="nouislider.css">
 	<link rel="stylesheet" href="yle.css">
@@ -154,7 +154,7 @@
 	//chanel2.value = 50; 
 
 	var socket = io.connect();
-	var DEBUG = 1;	//Debug
+	var DEBUG = 0;	//Debug
 	var ON = 1;
 	var OFF = 0;
 	var graph_blue = [];
@@ -187,6 +187,11 @@
         }
 		//if (DEBUG) console.log(graph_white);
 		myChart.data.datasets[0].data = graph_white;
+
+		//update de l'heure BUG: update pas :-(
+		myChart.options.annotation.annotations[0].label.content = data.infos.now_hour;
+		//convertir l heure en decimal
+		//myChart.options.annotation.annotations[0].value = heure_decimale
 
 		myChart.update();
 		//graph end
@@ -336,6 +341,7 @@
 		heures[i] = zero + i;// + "h";
 	}
 
+/*
 	//line current hour
 	var now = ['14'];
 	var annotations = now.map(function(date,index) {
@@ -354,6 +360,12 @@
 			}
 		}
 	})
+*/
+	var date = new Date();
+	var hour = date.getHours();
+	var min = date.getMinutes();
+	var hour_dec = hour + Math.round(100 * min / 60)/100;
+	//console.log(hour+":"+min); console.log(hour_dec);
 
 	ctx = document.getElementById('myChart');
 	var myChart = new Chart(ctx, {
@@ -382,63 +394,26 @@
 	        },
 		    annotation: {
 		    	drawTime: 'afterDatasetsDraw',
-		    	annotations: annotations
+		    	/*annotations: annotations*/
+		    	annotations: [{
+					type: 'line',
+					id: 'vline',
+					mode: 'vertical',
+					scaleID: 'x-axis-0',
+					value: hour_dec,
+					borderColor: 'red',
+					borderWidth: 2,
+					label: {
+						enabled: true,
+						position: "center",
+						content: hour+':'+min
+					}
+		    	}]
 			}
 		}
 	});
 // Graph end
 </script>
-
-<!-- TEST BEGIN -->
-<canvas id="ctx2"></canvas>
-<script type="text/javascript">
-var now= ['14'];
-var annotations = now.map(function(date, index) {
-   return {
-      type: 'line',
-      id: 'vline' + index,
-      mode: 'vertical',
-      scaleID: 'x-axis-0',
-      value: date,
-      borderColor: 'green',
-      borderWidth: 1,
-      label: {
-         enabled: true,
-         position: "top",
-         content: now[index]
-      }
-   }
-});
-
-var chart = new Chart(ctx2, {
-   type: 'line',
-   data: {
-      /*labels: ['2017-08-02', '2017-08-05', '2017-08-09', '2017-08-12', '2017-08-14'],*/
-      labels: heures,
-      datasets: [{
-         label: 'LINE',
-         data: [3, 1, 4, 2, 5],
-         backgroundColor: 'rgba(0, 119, 290, 0.2)',
-         borderColor: 'rgba(0, 119, 290, 0.6)'
-      }]
-   },
-   options: {
-      scales: {
-         yAxes: [{
-            ticks: {
-               beginAtZero: true
-            }
-         }]
-      },
-      annotation: {
-         drawTime: 'afterDatasetsDraw',
-         annotations: annotations
-      }
-   }
-});
-
-</script>
-<!-- TEST END -->
 
   </body>
 </html>
