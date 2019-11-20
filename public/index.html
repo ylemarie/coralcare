@@ -338,32 +338,13 @@
 	for (var i=0; i<=24; i++)  {
 		if (i<10) {	zero = "0"; }
 		else { zero = ""; }
-		heures[i] = zero + i;// + "h";
+		heures[i] = zero + i + "h";
 	}
 
-/*
-	//line current hour
-	var now = ['14'];
-	var annotations = now.map(function(date,index) {
-		return {
-			type: 'line',
-			id: 'vline' + index,
-			mode: 'vertical',
-			scaleID: 'x-axis-0',
-			value: date,
-			borderColor: 'red',
-			borderWidth: 2,
-			label: {
-				enabled: true,
-				position: "center",
-				content: now[index]
-			}
-		}
-	})
-*/
 	var date = new Date();
 	var hour = date.getHours();
 	var min = date.getMinutes();
+	if (min<10) { min = "0" + min;}
 	var hour_dec = hour + Math.round(100 * min / 60)/100;
 	//console.log(hour+":"+min); console.log(hour_dec);
 

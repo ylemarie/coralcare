@@ -18,41 +18,41 @@
    { 
       "name":"TPS",
       "value":[ 
-         { 
-            "hour":"11:00",
+         {
+            "hour":"10:00",
             "blue":0,
             "white":0
          },
          { 
+            "hour":"11:00",
+            "blue":15,
+            "white":15
+         },
+         { 
             "hour":"12:00",
-            "blue":16,
+            "blue":25,
             "white":25
          },
          { 
             "hour":"14:00",
-            "blue":40,
-            "white":50
+            "blue":35,
+            "white":35
          },
          { 
             "hour":"15:00",
-            "blue":50,
-            "white":50
+            "blue":45,
+            "white":45
          },
          { 
             "hour":"19:00",
-            "blue":50,
-            "white":50
-         },
-         { 
-            "hour":"20:00",
-            "blue":40,
-            "white":40
+            "blue":45,
+            "white":45
          },
          { 
             "hour":"22:00",
-            "blue":16,
-            "white":16
-         },         
+            "blue":20,
+            "white":20
+         },
          { 
             "hour":"23:00",
             "blue":0,
